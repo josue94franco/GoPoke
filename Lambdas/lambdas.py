@@ -19,6 +19,7 @@ def handler (event, context ):
         "name": name 
     }
     )
+    
     #Validar el nombre de del pokemos dentro  de la tabla para ya no consultar desde el api gateway.
     if response is not None and 'Items' in response:
             result = json_util.loads(response['Items'])
