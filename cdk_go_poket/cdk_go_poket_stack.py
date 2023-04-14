@@ -54,4 +54,4 @@ class CdkGoPoketStack(Stack):
             method_responses=[apigateway_cdk.MethodResponse(status_code="200")]
         )
 
-#Esta solución me costo pero ya quedo
+# falta prueba de despliegue
