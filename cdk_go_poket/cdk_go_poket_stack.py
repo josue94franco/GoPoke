@@ -18,7 +18,7 @@ class CdkGoPoketStack(Stack):
         fn = lambda_cdk.Function(self, "MyFunction", function_name="mylambda",
                                  runtime=lambda_cdk.Runtime.PYTHON_3_9,
                                  handler="lambdas.handler",
-                                 code=lambda_cdk.Code.from_asset(".co/Lambdas"),
+                                 code=lambda_cdk.Code.from_asset("./Lambdas"),
 
                                  )
         # creación de tabala de dynamodb
@@ -54,4 +54,4 @@ class CdkGoPoketStack(Stack):
             method_responses=[apigateway_cdk.MethodResponse(status_code="200")]
         )
 
-# falta prueba de despliegue
+# falta prueba de despliegue!!!!
