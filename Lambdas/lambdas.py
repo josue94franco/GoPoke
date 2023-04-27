@@ -3,10 +3,12 @@ import json
 import boto3
 import os
 from dynamodb_json import json_util
+from select import error
+
 
 # se crea un cliente de dynamodb
-client = boto3.client('dynamodb')
-
+client = boto3.resource('dynamodb')
+tabla = client.Table(os.environ["POKETABLE"])
 
 # contenido de servicio de Lambda.
 def handler(event, context):
@@ -16,14 +18,14 @@ def handler(event, context):
         name = query.get("name")
 
         # consultar la tabla para ver si esta el pokemon solicitado
-        response = client.get_item(
-            TableName=os.environ["POKETABLE"],
+        response = tabla.get_item(
+
             Key={
                 "name": name
             }
         )
 
-        # Validar el nombre de del pokemos dentro  de la tabla para ya no consultar desde el api gateway.
+        # Validar el nombre de del pokemon dentro  de la tabla para ya no consultar desde el api gateway.
         if response is not None and 'Items' in response:
             result = json_util.loads(response['Items'])
         else:
@@ -36,10 +38,10 @@ def handler(event, context):
                 timeout=25,
             )
             # El guardado en la tabla de DynamoDB.
-            result = response.text
+            result = response.json()
             result["name"] = name
-            response = client.put_item(
-                TableName=os.environ["POKETABLE"],  # VAriable de entorno
+            response = tabla.put_item(
+
                 Item=result
             )
         # la respuesta del servicio de la lambda y del api
@@ -55,7 +57,8 @@ def handler(event, context):
                 'Access-Control-Max-Age': '86400'
             }
         }
-    except Exception as error:
+    except Exception:
+        exc_type, exc_value, exc_traceback = error
 
         return {
             'statusCode': 400,
@@ -69,3 +72,8 @@ def handler(event, context):
                 'Access-Control-Max-Age': '86400'
             }
         }
+        return (400)
+    
+   
+    
+    
