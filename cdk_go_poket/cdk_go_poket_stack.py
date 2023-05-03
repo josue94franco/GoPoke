@@ -4,11 +4,12 @@ from aws_cdk import (
     aws_dynamodb as dynamodb_cdk,
     aws_lambda as lambda_cdk,
     aws_apigateway as apigateway_cdk,
+    
     RemovalPolicy
     # aws_sqs as sqs,
 )
 from constructs import Construct
-
+from Cognito.cognito import Cognito
 
 class CdkGoPoketStack(Stack):
 
@@ -43,6 +44,7 @@ class CdkGoPoketStack(Stack):
         # variable de entorno para que en el lambda podamos accerder a la tabla
         fn.add_environment("POKETABLE", table.table_name)
 
+        cognito = Cognito(self, "cognito")
         # creación de API Gateway
         api = apigateway_cdk.RestApi(self, "ChallengeTecnicoApi",
                                      default_cors_preflight_options=apigateway_cdk.CorsOptions(
@@ -51,6 +53,12 @@ class CdkGoPoketStack(Stack):
                                          allow_methods=apigateway_cdk.Cors.ALL_METHODS
                                      ),
                                      )
+        auth = apigateway_cdk.CognitoUserPoolsAuthorizer(
+            self,
+            f"{scope.node.id}-authorizer",
+            cognito_user_pools=[cognito.user_pool],
+            identity_source="method.request.header.Authorization",
+        )
 
         # armando el endpoint
         endpoint = api.root.add_resource("pokemon")
@@ -62,7 +70,9 @@ class CdkGoPoketStack(Stack):
                 proxy=True,
                 passthrough_behavior=apigateway_cdk.PassthroughBehavior.NEVER
             ),
-            method_responses=[apigateway_cdk.MethodResponse(status_code="200")]
+            method_responses=[apigateway_cdk.MethodResponse(status_code="200")],
+            authorization_type=apigateway_cdk.AuthorizationType.COGNITO,
+            authorizer=auth,
         )
 
 # falta prueba de despliegue!!!!

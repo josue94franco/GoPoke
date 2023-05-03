@@ -63,6 +63,11 @@ def handler(event, context):
         return {
             'statusCode': 400,
             'body': json.dumps(error),
+            """
+            json.dumps(cliente) crea y retorna una cadena de caracteres
+            con todos los pares clave-valor del diccionario en formato JSON.
+            """
+            
             'isBase64Encoded': False,
             # los headers son los encabezados principales del servicio
             'headers': {
